@@ -5,6 +5,7 @@
 This application works for the Urine Stone Risk Detector to record, analyze pictures being uploaded, and finally gives out the statistic results for the data read from token photoes. 
 
 **Author** ***Jiahe Jin***
+
 **Update Date** ***2020.11.06***
 
 **Current Status**
