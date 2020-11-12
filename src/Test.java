@@ -1,5 +1,4 @@
 import java.io.IOException;
-
 /**
  * The temporally test class that is used to see if the code can store and load the picture and have
  * a function to manipulate them into greyscale.
@@ -13,8 +12,8 @@ public class Test {
      */
     public static void main(String[] args) throws IOException {
         ImageTank myImages = new ImageTank();
-        myImages.storeImage("Adult Zebrafish Cardiac Structures.png");
-        myImages.getGreyscale("Adult Zebrafish Cardiac Structures.png");
+        myImages.storeImage("heart.png");
+        myImages.getGrayscale("heart.png");
     }
 
 }

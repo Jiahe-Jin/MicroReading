@@ -13,7 +13,7 @@ import java.util.Hashtable;
  *
  * @author Jiahe Jin
  */
-public class ImageTank {
+public class ImageTank implements java.io.Serializable {
     private Hashtable imageTable;
 
 
@@ -87,22 +87,22 @@ public class ImageTank {
     }
 
     /**
-     * This method intends to manipulate an image into greyscale by calling its helper method.
+     * This method intends to manipulate an image into grayscale by calling its helper method.
      *
      * @param name the name (non-absolute path) of the image.
      * @throws IOException when fails to write the fail.
      */
-    public void getGreyscale(String name) throws IOException {
-        this.getGreyscale((Image) imageTable.get(name));
+    public void getGrayscale(String name) throws IOException {
+        this.getGrayscale((Image) imageTable.get(name));
     }
 
     /**
-     * The private helper method intends to manipulate an image into greyscale.
+     * The private helper method intends to manipulate an image into grayscale.
      *
      * @param image the Image Class of the specific image.
      * @throws IOException when fails to write the fail.
      */
-    private void getGreyscale(Image image) throws IOException {
+    private void getGrayscale(Image image) throws IOException {
         BufferedImage buffer = image.bufferedImage;
         for (int y = 0; y < buffer.getHeight(); y++) {
             for (int x = 0; x < buffer.getWidth(); x++) {
@@ -115,10 +115,85 @@ public class ImageTank {
                 buffer.setRGB(x, y, rgb);
             }
         }
-        ImageIO.write(buffer, image.name.split("[.]")[1], new File("grey_" + image.name));
-        ImagePlus grayImg = new ImagePlus("grey", buffer);
+        ImageIO.write(buffer, image.name.split("[.]")[1], new File("gray_" + image.name));
+        ImagePlus grayImg = new ImagePlus("gray", buffer);
         grayImg.show();
+    }
 
+    /**
+     * This method intends to compare colors between two images by using RGB tuples to measure the
+     * Euclidean distances in the color space. If dimensions of two images are equal, the whole images
+     * are compared. However, if dimensions are  different, only centered 90% (widths and heights)
+     * part of smaller dimension in two pictures are compared.
+     *
+     * @param image1 the Image Object of one of two compared images
+     * @param image2 the Image Object of one of two compared images
+     */
+    public void colorComparison(Image image1, Image image2) {
+        int width1 = image1.bufferedImage.getWidth();
+        int width2 = image2.bufferedImage.getWidth();
+        int height1 = image1.bufferedImage.getHeight();
+        int height2 = image2.bufferedImage.getHeight();
+        double total_pixels = 0; // total number of pixels
+
+        double difference = 0; // The different pixel
+        if (width1 == width2 && height1 == height2) {
+            for (int y = 0; y < height1; y++) {
+                for (int x = 0; x < width1; x++) {
+                    int rgb1 = image1.bufferedImage.getRGB(x, y);
+                    int rgb2 = image2.bufferedImage.getRGB(x, y);
+                    int red1 = (rgb1 >> 16) & 0xff;
+                    int green1 = (rgb1 >> 8) & 0xff;
+                    int blue1 = (rgb1 >> 0) & 0xff;
+                    int red2 = (rgb2 >> 16) & 0xff;
+                    int green2 = (rgb2 >> 8) & 0xff;
+                    int blue2 = (rgb2 >> 0) & 0xff;
+                    difference += Math.abs(red2 - red1) ^ 2;
+                    difference += Math.abs(green2 - green1) ^ 2;
+                    difference += Math.abs(blue2 - blue1) ^ 2;
+                }
+            }
+            total_pixels = height1 * width1 * 3;
+        } else {
+            // Smaller Height and Width Selector
+            int smallerHeight = 0;
+            int smallerWidth = 0;
+            if (height1 < height2) {
+                smallerHeight = height1;
+            } else {
+                smallerHeight = height2;
+            }
+            if (width1 < width2) {
+                smallerWidth = width1;
+            } else {
+                smallerWidth = width2;
+            }
+
+            for (int y = (int) (0.1 * smallerHeight); y < 0.9 * smallerHeight; smallerHeight++) {
+                for (int x = (int) (0.1 * smallerWidth); x < 0.9 * smallerWidth; smallerWidth++) {
+                    int rgb1 = image1.bufferedImage.getRGB(x, y);
+                    int rgb2 = image2.bufferedImage.getRGB(x, y);
+                    int red1 = (rgb1 >> 16) & 0xff;
+                    int green1 = (rgb1 >> 8) & 0xff;
+                    int blue1 = (rgb1 >> 0) & 0xff;
+                    int red2 = (rgb2 >> 16) & 0xff;
+                    int green2 = (rgb2 >> 8) & 0xff;
+                    int blue2 = (rgb2 >> 0) & 0xff;
+                    difference += Math.abs(red2 - red1) ^ 2;
+                    difference += Math.abs(green2 - green1) ^ 2;
+                    difference += Math.abs(blue2 - blue1) ^ 2;
+                }
+            }
+            total_pixels = smallerHeight * smallerWidth * 3;
+        }
+        // The final difference
+        double distance = Math.sqrt(difference);
+        // Normalizing the value of different pixels
+        double avg_difference_pixel = distance / total_pixels;
+        // There are 255 values of pixels in total
+        double percentage = (avg_difference_pixel / 255) * 100;
+
+        System.out.println("The difference: " + percentage + "%.");
     }
 
 
@@ -129,10 +204,10 @@ public class ImageTank {
      * @author Jiahe Jin
      */
     protected class Image {
-        String name;
-        Date date;
-        BufferedImage bufferedImage;
-        ImagePlus imagePlus;
+        protected String name;
+        protected Date date;
+        protected BufferedImage bufferedImage;
+        protected ImagePlus imagePlus;
 
         /**
          * The non-default constructor is used to construct the image class with its name and automatically
@@ -144,9 +219,9 @@ public class ImageTank {
          */
         protected Image(String name) throws IOException {
             this.name = name;
-            imagePlus = new ImagePlus(name);
-            bufferedImage = ImageIO.read(new File(name));
-            date = new Date();
+            this.imagePlus = new ImagePlus(name);
+            this.bufferedImage = ImageIO.read(new File(name));
+            this.date = new Date();
 
         }
 
@@ -170,7 +245,5 @@ public class ImageTank {
             this.date = new Date(year, month, day);
         }
     }
-
-
 
 }
