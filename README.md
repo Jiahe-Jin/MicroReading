@@ -6,7 +6,7 @@ This application works for the Urine Stone Risk Detector to record, analyze pict
 
 **Author** ***Jiahe Jin***
 
-**Update Date** ***2020.11.06***
+**Update Date** ***2020.11.12***
 
 **Current Status**
 
