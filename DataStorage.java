@@ -184,6 +184,17 @@ public class DataStorage implements Serializable {
         return false;
     }
 
+    public boolean storeCompNode(CompNode compNode){
+        try{
+            this.dataAnalysis.storeCompNode(compNode);
+            writeDataAnalysis(this.dataAnalysis);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+
+    }
+
     public boolean removeCompNode(CompNode compNode) {
         try {
             this.dataAnalysis.removeCompNode(compNode);

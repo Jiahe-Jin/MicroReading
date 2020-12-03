@@ -291,8 +291,11 @@ public class Launch {
         // When the standard line has been set
         else {
             for (Image each : storage.imageTable.imageList) {
-                if (!storage.dataAnalysis.compList.contains(each)) {
-                    storage.storeTarget(each);
+                if (!storage.dataAnalysis.contains(each.name)) {
+                    Image control =
+                        storage.imageTable.get(storage.dataAnalysis.compList.get(0).control.name);
+                    double difference = processor.colorComparison(control, each);
+                    storage.storeComparison(control, each, difference);
                 }
             }
             this.inputParameter();

@@ -38,6 +38,10 @@ public class DataAnalysis implements Serializable {
         return false;
     }
 
+    public boolean storeCompNode(CompNode compNode){
+        return compList.add(compNode);
+    }
+
     public boolean removeCompNode(CompNode compNode){
         return this.compList.remove(compNode);
     }
